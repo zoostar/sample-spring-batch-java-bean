@@ -8,6 +8,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,8 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest
 @SpringBatchTest
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { SampleSpringBatchApplication.class, BatchConfiguration.class })
-public class SampleSpringBatchApplicationTest {
+@ContextConfiguration(classes = { BatchConfiguration.class })
+public class BatchConfigurationTest {
 
 	private JobLauncherTestUtils jobLauncherTestUtils; 
 
@@ -30,12 +31,13 @@ public class SampleSpringBatchApplicationTest {
     	log.debug("setJobLauncherTestUtils({})", jobLauncherTestUtils);
     	this.jobLauncherTestUtils = jobLauncherTestUtils;
     }
-//    @Autowired
-//    JobRepositoryTestUtils jobRepositoryTestUtils;
+
+    @Autowired
+    JobRepositoryTestUtils jobRepositoryTestUtils;
     
     @After
     void cleanup() {
-//    	jobRepositoryTestUtils.removeJobExecutions();
+    	jobRepositoryTestUtils.removeJobExecutions();
     }
     
 	@Test
