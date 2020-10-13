@@ -14,6 +14,7 @@ import org.springframework.batch.core.configuration.annotation.DefaultBatchConfi
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.item.ItemProcessor;
@@ -37,8 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @EnableBatchProcessing
 public class BatchConfiguration {
-	
-	private boolean readingComplete = false;
 
 	@Value("${batch.driver.class.name:org.h2.Driver}")
 	protected String batchDriverClassName;
@@ -57,7 +56,7 @@ public class BatchConfiguration {
 
 	@Autowired
 	private StepBuilderFactory stepBuilderFactory;
-
+	
 	@Bean
 	@Qualifier("dataSource")
 	public BatchConfigurer batchConfigurer(DataSource dataSource) {
@@ -94,31 +93,19 @@ public class BatchConfiguration {
 	}
 
 	@Bean
-	public Job jobEchoMessage(JobExecutionListener listener) {
+	public Job jobEchoMessage(JobExecutionListener listener, ItemReader<String> itemReader) {
 		return jobBuilderFactory.get("echoMessage").
 				incrementer(new RunIdIncrementer()).
 				listener(listener).
-				start(step1()).
+				start(step1(itemReader)).
 				build();
 	}
 	
 
-	protected Step step1() {
+	protected Step step1(ItemReader<String> itemReader) {
 		return stepBuilderFactory.get("step1").
 			    <String, String> chunk(10).
-			    reader(new ItemReader<String>() {
-
-					@Override
-					public String read()
-							throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-						if(readingComplete) {
-							return null;
-						}
-						readingComplete = true;
-						return "Hello World";
-					}
-			    	
-			    }).
+			    reader(itemReader).
 			    processor(new ItemProcessor<String, String>() {
 
 					@Override
@@ -143,4 +130,25 @@ public class BatchConfiguration {
 			    build();
 	}
 	
+	@Bean
+	@StepScope
+	public ItemReader<String> itemReader(@Value("#{jobParameters['batch.message']}") final String message) {
+    	return new ItemReader<String>() {
+	    	
+	    	private boolean complete = false;
+	    	
+	    	@Override
+	    	public String read()
+	    			throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
+	    		if(complete) {
+	    			return null;
+	    		}
+	    		complete = true;
+	    		if(message == null)
+	    			throw new Exception("Input cannot be null!");
+	    		return message;
+	    	}
+    	};
+	}
+
 }

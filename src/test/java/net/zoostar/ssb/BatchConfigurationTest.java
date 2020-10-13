@@ -1,5 +1,7 @@
 package net.zoostar.ssb;
 
+import java.security.SecureRandom;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -7,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
@@ -23,18 +26,15 @@ import lombok.extern.slf4j.Slf4j;
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { BatchConfiguration.class })
 public class BatchConfigurationTest {
-
-	private JobLauncherTestUtils jobLauncherTestUtils; 
-
-    @Autowired
-    public void setJobLauncherTestUtils(JobLauncherTestUtils jobLauncherTestUtils) {
-    	log.debug("setJobLauncherTestUtils({})", jobLauncherTestUtils);
-    	this.jobLauncherTestUtils = jobLauncherTestUtils;
-    }
+	
+	private SecureRandom secureRandom = new SecureRandom();
+	
+	@Autowired
+	JobLauncherTestUtils jobLauncherTestUtils;
 
     @Autowired
     JobRepositoryTestUtils jobRepositoryTestUtils;
-    
+  
     @After
     void cleanup() {
     	jobRepositoryTestUtils.removeJobExecutions();
@@ -43,14 +43,24 @@ public class BatchConfigurationTest {
 	@Test
 	void testJobEchoMessage() throws Exception {
 		log.info("{}", "Begin Test...");
-        // given
-        JobParameters jobParameters = jobLauncherTestUtils.getUniqueJobParameters();
-
-        // when
-        JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
-
-        // then
-        Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		final JobParameters jobParameters = given();
+//		JobExecution jobExecution = when(jobParameters);
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
+		then(jobExecution);
 	}
+	
+	protected JobParameters given() {
+        return new JobParametersBuilder().
+        		addLong("random", secureRandom.nextLong()).
+        		addString("batch.message", "Hello World").
+        		toJobParameters();
+	}
+	
+//	protected JobExecution when(JobParameters jobParameters) throws Exception {
+//		return jobLauncherTestUtils.launchJob(jobParameters);
+//	}
 
+	protected void then(JobExecution jobExecution) {
+		 Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+	}
 }
