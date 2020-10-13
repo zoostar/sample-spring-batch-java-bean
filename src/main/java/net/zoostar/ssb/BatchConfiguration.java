@@ -132,10 +132,13 @@ public class BatchConfiguration {
 	
 	@Bean
 	@StepScope
-	public ItemReader<String> itemReader(@Value("#{jobParameters['batch.message']}") final String message) {
+	public ItemReader<String> itemReader() {
     	return new ItemReader<String>() {
 	    	
 	    	private boolean complete = false;
+	    	
+	    	@Value("#{jobParameters['batch.message']}")
+	    	private String message;
 	    	
 	    	@Override
 	    	public String read()
