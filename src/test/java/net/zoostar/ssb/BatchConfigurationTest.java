@@ -2,8 +2,8 @@ package net.zoostar.ssb;
 
 import java.security.SecureRandom;
 
-import org.junit.After;
 import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
@@ -35,32 +35,41 @@ public class BatchConfigurationTest {
     @Autowired
     JobRepositoryTestUtils jobRepositoryTestUtils;
   
-    @After
+    @AfterEach
     void cleanup() {
     	jobRepositoryTestUtils.removeJobExecutions();
     }
     
 	@Test
-	void testJobEchoMessage() throws Exception {
-		log.info("{}", "Begin Test...");
-		final JobParameters jobParameters = given();
-//		JobExecution jobExecution = when(jobParameters);
-		JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);
-		then(jobExecution);
-	}
-	
-	protected JobParameters given() {
-        return new JobParametersBuilder().
-        		addLong("random", secureRandom.nextLong()).
-        		addString("batch.message", "Hello World").
-        		toJobParameters();
-	}
-	
-//	protected JobExecution when(JobParameters jobParameters) throws Exception {
-//		return jobLauncherTestUtils.launchJob(jobParameters);
-//	}
+	void testSuccessfulJobEchoMessage() throws Exception {
+		log.info("{}", "Begin testSuccessfulJobEchoMessage...");
+		
+		// given
+		JobParameters parameters = new JobParametersBuilder().
+				addLong("random", secureRandom.nextLong()).
+				addString("resource", "data/input.txt").
+				toJobParameters();
 
-	protected void then(JobExecution jobExecution) {
-		 Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		// when
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob(parameters);
+		
+		// then
+		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
+    
+//	@Test
+//	void testJobEchoMessageFailure() throws Exception {
+//		log.info("{}", "Begin testJobEchoMessageFailure...");
+//		
+//		// given
+//		JobParameters parameters = new JobParametersBuilder().
+//				addLong("random", secureRandom.nextLong()).
+//				toJobParameters();
+//
+//		// when
+//		JobExecution jobExecution = jobLauncherTestUtils.launchJob(parameters);
+//		
+//		// then
+//		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+//	}
 }
