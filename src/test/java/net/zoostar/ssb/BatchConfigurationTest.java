@@ -57,19 +57,36 @@ public class BatchConfigurationTest {
 		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
     
-//	@Test
-//	void testJobEchoMessageFailure() throws Exception {
-//		log.info("{}", "Begin testJobEchoMessageFailure...");
-//		
-//		// given
-//		JobParameters parameters = new JobParametersBuilder().
-//				addLong("random", secureRandom.nextLong()).
-//				toJobParameters();
-//
-//		// when
-//		JobExecution jobExecution = jobLauncherTestUtils.launchJob(parameters);
-//		
-//		// then
-//		Assert.assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-//	}
+	@Test
+	void testJobEchoMessagewithMissingResource() throws Exception {
+		log.info("{}", "Begin testJobEchoMessagewithMissingResource...");
+		
+		// given
+		JobParameters parameters = new JobParametersBuilder().
+				addLong("random", secureRandom.nextLong()).
+				toJobParameters();
+
+		// when
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob(parameters);
+		
+		// then
+		Assert.assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+	}
+    
+	@Test
+	void testJobEchoMessagewithInvalidResourcePath() throws Exception {
+		log.info("{}", "Begin testJobEchoMessagewithInvalidResourcePath...");
+		
+		// given
+		JobParameters parameters = new JobParametersBuilder().
+				addLong("random", secureRandom.nextLong()).
+				addString("resource", "input.txt").
+			toJobParameters();
+
+		// when
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob(parameters);
+		
+		// then
+		Assert.assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+	}
 }
