@@ -89,4 +89,22 @@ public class BatchConfigurationTest {
 		// then
 		Assert.assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 	}
+    
+	@Test
+	void testJobEchoMessagewithProcessingFailure() throws Exception {
+		log.info("{}", "Begin testJobEchoMessagewithProcessingFailure...");
+		
+		// given
+		JobParameters parameters = new JobParametersBuilder().
+				addLong("random", secureRandom.nextLong()).
+				addString("resource", "data/invalid_input.txt").
+			toJobParameters();
+
+		// when
+		JobExecution jobExecution = jobLauncherTestUtils.launchJob(parameters);
+		
+		// then
+		Assert.assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+	}
+
 }
