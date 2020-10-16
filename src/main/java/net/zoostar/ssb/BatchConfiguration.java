@@ -14,20 +14,20 @@ import org.springframework.batch.core.configuration.annotation.DefaultBatchConfi
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.NonTransientResourceException;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.LineMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -130,28 +130,28 @@ public class BatchConfiguration {
 			    build();
 	}
 	
+	
 	@Bean
-	@StepScope
-	public ItemReader<String> itemReader() {
-    	return new ItemReader<String>() {
-	    	
-	    	private boolean complete = false;
-	    	
-	    	@Value("#{jobParameters['batch.message']}")
-	    	private String message;
-	    	
-	    	@Override
-	    	public String read()
-	    			throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-	    		if(complete) {
-	    			return null;
-	    		}
-	    		complete = true;
-	    		if(message == null)
-	    			throw new Exception("Input cannot be null!");
-	    		return message;
-	    	}
-    	};
+	public FlatFileItemReader<String> itemReader(Resource resource) {
+    	FlatFileItemReader<String> itemReader = new FlatFileItemReader<>();
+    	itemReader.setLineMapper(new LineMapper<String>() {
+
+			@Override
+			public String mapLine(String line, int lineNumber) throws Exception {
+				log.debug("Mapping line: {}", lineNumber);
+				return line;
+			}
+    		
+    	});
+    	itemReader.setLinesToSkip(1);
+    	log.info("Input resource: {}", resource);
+    	itemReader.setResource(resource);
+    	return itemReader;
+	}
+	
+	@Bean
+	public FileSystemResource fileSystemResource() {
+		return new FileSystemResource("data/input.txt");
 	}
 
 }

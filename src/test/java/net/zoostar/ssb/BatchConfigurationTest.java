@@ -52,7 +52,6 @@ public class BatchConfigurationTest {
 	protected JobParameters given() {
         return new JobParametersBuilder().
         		addLong("random", secureRandom.nextLong()).
-        		addString("batch.message", "Hello World").
         		toJobParameters();
 	}
 	
