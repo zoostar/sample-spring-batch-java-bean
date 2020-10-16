@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest
 @SpringBatchTest
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = { BatchConfiguration.class })
+@ContextConfiguration(classes = { TestBatchConfiguration.class, BatchConfiguration.class })
 public class BatchConfigurationTest {
 	
 	private SecureRandom secureRandom = new SecureRandom();
