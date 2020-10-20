@@ -15,7 +15,7 @@ public class TestBatchConfiguration {
 	@Bean
 	@StepScope
 	public ClassPathResource classPathResource(@Value("#{jobParameters['resource']}") String resource) {
-		log.info("fileSystemResource({})", resource);
+		log.info("classPathResource({})", resource);
 		return new ClassPathResource(resource);
 	}
 
