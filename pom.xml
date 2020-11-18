@@ -10,7 +10,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>net.zoostar</groupId>
-	<artifactId>sample-spring-batch</artifactId>
+	<artifactId>sample-spring-batch-java-bean</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>sample-spring-batch</name>
 	<description>Demo project for Spring Boot</description>

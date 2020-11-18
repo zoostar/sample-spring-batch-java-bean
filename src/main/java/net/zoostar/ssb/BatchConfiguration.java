@@ -42,7 +42,7 @@ public class BatchConfiguration {
 	@Value("${batch.driver.class.name:org.h2.Driver}")
 	protected String batchDriverClassName;
 
-	@Value("${batch.jdbc.url:jdbc:h2:file:./target/task}")
+	@Value("${batch.jdbc.url:jdbc:h2:mem:task;INIT=RUNSCRIPT FROM 'classpath:schema.sql'}")
 	protected String batchJdbcUrl;
 
 	@Value("${batch.username:}")
