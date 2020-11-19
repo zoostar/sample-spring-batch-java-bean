@@ -1,21 +1,21 @@
 package net.zoostar.ssb;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.core.io.FileSystemResource;
 
-class FileSystemResourceTest {
+public class FileSystemResourceTest {
 	
 	BatchConfiguration batchConfiguration;
 	
-	@BeforeEach
+	@Before
 	public void setup() {
 		batchConfiguration = new BatchConfiguration();
 	}
 
 	@Test
-	void testFileSystemResource() {
+	public void testFileSystemResource() {
 		// Given
 		String filename = "input.txt";
 		

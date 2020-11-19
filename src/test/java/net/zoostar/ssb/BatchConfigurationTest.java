@@ -2,9 +2,12 @@ package net.zoostar.ssb;
 
 import java.security.SecureRandom;
 
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -14,18 +17,16 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SpringBootTest
 @SpringBatchTest
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = { TestBatchConfiguration.class, BatchConfiguration.class })
-class BatchConfigurationTest {
+public class BatchConfigurationTest {
 	
 	private SecureRandom secureRandom = new SecureRandom();
 	
@@ -34,16 +35,22 @@ class BatchConfigurationTest {
 
     @Autowired
     JobRepositoryTestUtils jobRepositoryTestUtils;
+    
+    @Rule
+    public TestName test = new TestName();
   
-    @AfterEach
-    void cleanup() {
+    @Before
+    public void setup() {
+    	log.info("Executing test: {}...", test.getMethodName());
+    }
+    
+    @After
+    public void cleanup() {
     	jobRepositoryTestUtils.removeJobExecutions();
     }
     
 	@Test
-	void testSuccessfulJobEchoMessage() throws Exception {
-		log.info("{}", "Begin testSuccessfulJobEchoMessage...");
-		
+	public void testSuccessfulJobEchoMessage() throws Exception {
 		// given
 		JobParameters parameters = new JobParametersBuilder().
 				addLong("random", secureRandom.nextLong()).
@@ -58,9 +65,7 @@ class BatchConfigurationTest {
 	}
     
 	@Test
-	void testJobEchoMessagewithMissingResource() throws Exception {
-		log.info("{}", "Begin testJobEchoMessagewithMissingResource...");
-		
+	public void testJobEchoMessagewithMissingResource() throws Exception {
 		// given
 		JobParameters parameters = new JobParametersBuilder().
 				addLong("random", secureRandom.nextLong()).
@@ -74,9 +79,7 @@ class BatchConfigurationTest {
 	}
     
 	@Test
-	void testJobEchoMessagewithInvalidResourcePath() throws Exception {
-		log.info("{}", "Begin testJobEchoMessagewithInvalidResourcePath...");
-		
+	public void testJobEchoMessagewithInvalidResourcePath() throws Exception {
 		// given
 		JobParameters parameters = new JobParametersBuilder().
 				addLong("random", secureRandom.nextLong()).
@@ -91,9 +94,7 @@ class BatchConfigurationTest {
 	}
     
 	@Test
-	void testJobEchoMessagewithProcessingFailure() throws Exception {
-		log.info("{}", "Begin testJobEchoMessagewithProcessingFailure...");
-		
+	public void testJobEchoMessagewithProcessingFailure() throws Exception {
 		// given
 		JobParameters parameters = new JobParametersBuilder().
 				addLong("random", secureRandom.nextLong()).
